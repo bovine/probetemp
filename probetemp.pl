@@ -30,32 +30,36 @@ while (1) {
 	my $timestamp = time();
 	$linesread++;
 
-	if ($line =~ m/^(\d)\s+([\d\.]+)/) {
+	if ($line =~ m/^([1234])\s+([\d\.]+)/) {
 	    my ($sensor, $degrees) = ($1, $2);
 	    $lastread{$sensor}{'degrees'} = $degrees;
 	    $lastread{$sensor}{'timestamp'} = $timestamp;
 	} else {
-	    #print "$timestamp: Got line \"$1\"\n";
+	    #print "$timestamp: Ignoring line \"$line\"\n";
 	}
     }
-    if ($linesread >= 9 && defined($lastread{1}) && defined($lastread{2})) {
-	# Write to a CSV file.
-	open(FILE, ">>probetemp.txt") || die "failed to open log file";
-	foreach my $id (keys(%lastread)) {
-	    print FILE $lastread{$id}{'timestamp'} . "," . $id . "," . $lastread{$id}{'degrees'} . "\n";
-	}
-	close(FILE);
-
-	# Save to RRD database.
-	my @template;
-	my @valuelist;
-	foreach my $id (keys(%lastread)) {
-	    push(@template, "id$id");
-	    push(@valuelist, $lastread{$id}{'degrees'});
-	}
-	RRDs::update ("probetemp.rrd", "--template", join(':', @template),
-		      "N:" . join(':', @valuelist))
-	    or warn "failed to update RRD";
-	last;
-    }
+    last if ($linesread >= 9 && scalar(keys(%lastread)));
 }
+
+
+# Write to a CSV file.
+open(FILE, ">>probetemp.txt") || die "failed to open log file";
+foreach my $id (keys(%lastread)) {
+    print FILE $lastread{$id}{'timestamp'} . "," . $id . "," . $lastread{$id}{'degrees'} . "\n";
+}
+close(FILE);
+
+# Save to RRD database.
+{
+    my @template;
+    my @valuelist;
+    foreach my $id (keys(%lastread)) {
+	push(@template, "id$id");
+	push(@valuelist, $lastread{$id}{'degrees'});
+    }
+    RRDs::update ("probetemp.rrd", "--template", join(':', @template),
+		  "N:" . join(':', @valuelist))
+	or warn "failed to update RRD";
+}
+
+exit 0;
