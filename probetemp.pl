@@ -30,7 +30,7 @@ while (1) {
 	my $timestamp = time();
 	$linesread++;
 
-	if ($line =~ m/^([1234])\s+([\d\.]+)/) {
+	if ($line =~ m/^([1234])\s+(\-?[\d\.]+)/) {
 	    my ($sensor, $degrees) = ($1, $2);
 	    $lastread{$sensor}{'degrees'} = $degrees;
 	    $lastread{$sensor}{'timestamp'} = $timestamp;
