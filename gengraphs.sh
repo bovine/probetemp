@@ -18,7 +18,7 @@ DAYCOLOR="#227722"
 
 rrdtool graph $IMAGEFILE3 \
     -A -w600 -h480 --imgformat=PNG \
-    --title="Cowhouse Temperatures (last 3 days)" \
+    --title="Cowhouse Temperatures (last 3 days) ... $(date)" \
     --vertical-label="Temperature (F)" \
     --start="-3 day" \
     DEF:id1=$RRDFILE:id1:AVERAGE \
@@ -36,7 +36,7 @@ rrdtool graph $IMAGEFILE3 \
     VRULE:$(date -d '-2 day 0:00' +%s)$DAYCOLOR \
     VRULE:$(date -d '-3 day 0:00' +%s)$DAYCOLOR \
     COMMENT:"\\l" \
-    COMMENT:"currently " \
+    COMMENT:"currently ..." \
     GPRINT:id1f:LAST:"attic %.1lf" \
     GPRINT:id2f:LAST:"outside %.1lf" \
     GPRINT:id3f:LAST:"datacenter %.1lf\\r" >/dev/null
@@ -45,7 +45,7 @@ rrdtool graph $IMAGEFILE3 \
 
 rrdtool graph $IMAGEFILE14 \
     -A -w600 -h480 --imgformat=PNG \
-    --title="Cowhouse Temperatures (last 14 days)" \
+    --title="Cowhouse Temperatures (last 14 days) ... $(date)" \
     --vertical-label="Temperature (F)" \
     --start="-14 day" \
     DEF:id1=$RRDFILE:id1:AVERAGE \
@@ -72,7 +72,12 @@ rrdtool graph $IMAGEFILE14 \
     VRULE:$(date -d '-11 day 0:00' +%s)$DAYCOLOR \
     VRULE:$(date -d '-12 day 0:00' +%s)$DAYCOLOR \
     VRULE:$(date -d '-13 day 0:00' +%s)$DAYCOLOR \
-    VRULE:$(date -d '-14 day 0:00' +%s)$DAYCOLOR >/dev/null
+    VRULE:$(date -d '-14 day 0:00' +%s)$DAYCOLOR \
+    COMMENT:"\\l" \
+    COMMENT:"currently ..." \
+    GPRINT:id1f:LAST:"attic %.1lf" \
+    GPRINT:id2f:LAST:"outside %.1lf" \
+    GPRINT:id3f:LAST:"datacenter %.1lf\\r" >/dev/null
 
 chcon -t httpd_sys_content_t $IMAGEFILE3 $IMAGEFILE14
 
