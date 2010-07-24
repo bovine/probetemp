@@ -1,8 +1,8 @@
 #!/bin/sh
 
 RRDFILE=probetemp.rrd
-IMAGEFILE3=~/public_html/probetemp3.png
-IMAGEFILE14=~/public_html/probetemp14.png
+IMAGEFILE3=~/public_html/probetemp/probetemp3.png
+IMAGEFILE14=~/public_html/probetemp/probetemp14.png
 
 if [ ! -f $RRDFILE ]; then
     echo "Could not access $RRDFILE"
@@ -11,16 +11,20 @@ fi
 
 
 #DAYCOLOR="#aaaa00"
-DAYCOLOR="#227722"
+#DAYCOLOR="#227722"
+DAYCOLOR="#66aa66"
 # needs rrdtool-1.2.9 or higher.
 #export LANG=en_US.UTF-8
 #    --vertical-label="Temperature (°F)"
+
+#     --upper-limit 145 --lower-limit 20 --rigid
 
 rrdtool graph $IMAGEFILE3 \
     -A -w600 -h480 --imgformat=PNG \
     --title="Cowhouse Temperatures (last 3 days) ... $(date)" \
     --vertical-label="Temperature (F)" \
     --start="-3 day" \
+    --slope-mode \
     DEF:id1=$RRDFILE:id1:AVERAGE \
     DEF:id2=$RRDFILE:id2:AVERAGE \
     DEF:id3=$RRDFILE:id3:AVERAGE \
@@ -48,6 +52,8 @@ rrdtool graph $IMAGEFILE14 \
     --title="Cowhouse Temperatures (last 14 days) ... $(date)" \
     --vertical-label="Temperature (F)" \
     --start="-14 day" \
+    --slope-mode \
+    --x-grid HOUR:8:DAY:1:DAY:1:0:"%a%d" \
     DEF:id1=$RRDFILE:id1:AVERAGE \
     DEF:id2=$RRDFILE:id2:AVERAGE \
     DEF:id3=$RRDFILE:id3:AVERAGE \
@@ -80,4 +86,7 @@ rrdtool graph $IMAGEFILE14 \
     GPRINT:id3f:LAST:"datacenter %.1lf\\r" >/dev/null
 
 chcon -t httpd_sys_content_t $IMAGEFILE3 $IMAGEFILE14
+
+
+exit 0
 
