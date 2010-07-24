@@ -3,19 +3,24 @@
 use RRDs;
 use strict;
 
-if (!-f "probetemp.rrd") {
-    print "Creating new database.\n";
-    system("rrdtool create probetemp.rrd -b 1127636956 --step 300 DS:id1:GAUGE:600:-50:100 DS:id2:GAUGE:600:-50:100 DS:id3:GAUGE:600:-50:100 DS:id4:GAUGE:600:-50:100 RRA:AVERAGE:0.5:1:1200 RRA:MIN:0.5:12:2400 RRA:MAX:0.5:12:2400 RRA:AVERAGE:0.5:12:2400");
+my $rrdfile = 'probetemp.rrd';
+
+if ($ARGV[0]) {
+    $rrdfile = $ARGV[0];
 }
 
-open(FILE, "probetemp3.txt") || die;
+if (!-f $rrdfile) {
+    print "Creating new database.\n";
+    system("rrdtool create $rrdfile -b 1127636956 --step 300 DS:id1:GAUGE:600:-50:100 DS:id2:GAUGE:600:-50:100 DS:id3:GAUGE:600:-50:100 DS:id4:GAUGE:600:-50:100 RRA:AVERAGE:0.5:1:1200 RRA:MIN:0.5:12:2400 RRA:MAX:0.5:12:2400 RRA:AVERAGE:0.5:12:2400");
+}
+
 my $lasttime = 0;
 my %lastvalues;
-while (<FILE>) {
+while (<STDIN>) {
     chomp;
     my ($timestamp, $id, $degrees) = split(',');
     if ($timestamp < $lasttime) {
-	print "Rejecting decreasing timestamp.\n";
+	print "Rejecting decreasing timestamp $timestamp < $lasttime.\n";
 	next;
     } elsif ($timestamp == $lasttime) {
 	$lastvalues{$id} = $degrees;
@@ -29,11 +34,11 @@ while (<FILE>) {
 	    push(@valuelist, $lastvalues{$a});
 	}
 	if (scalar(@template)) {
-	    #my $cmdline = "rrdupdate probetemp.rrd --template " . join(':', @template) . 
+	    #my $cmdline = "rrdupdate $rrdfile --template " . join(':', @template) . 
 	    #" $timestamp:" . join(':', @valuelist);
 	    #system($cmdline) && print "cmdline was: $cmdline\n";
 	    
-	    RRDs::update ("probetemp.rrd", "--template", join(':', @template), 
+	    RRDs::update ($rrdfile, "--template", join(':', @template), 
 			  "$lasttime:" . join(':', @valuelist))
 		or warn "failed to update $lasttime";
 	}
