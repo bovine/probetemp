@@ -25,6 +25,7 @@ my %lastread;
 my $linesread = 0;
 while (1) {
     $buffer .= $PortObj->read(255);
+    #print "got $buffer\n";
     while ($buffer =~ s/^(.*?)[\n\r]+//s) {
 	my $line = $1;
 	my $timestamp = time();
@@ -46,6 +47,7 @@ while (1) {
 open(FILE, ">>probetemp.txt") || die "failed to open log file";
 foreach my $id (keys(%lastread)) {
     print FILE $lastread{$id}{'timestamp'} . "," . $id . "," . $lastread{$id}{'degrees'} . "\n";
+    #print "got ". $lastread{$id}{'timestamp'} . "," . $id . "," . $lastread{$id}{'degrees'} . "\n";
 }
 close(FILE);
 
