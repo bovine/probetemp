@@ -1,0 +1,14 @@
+This is a set of several utilities that allow you to record and graph
+temperatures from a Dallas DS18S20 compatible sensor over an RS232
+serial port.  The utilities are:
+
+* readtemp.pl -- diagnostic utility to test sensor readability
+* probetemp.pl -- capture temperature readings to a TXT logfile and an RRD file
+* gengraphs.sh -- generate PNG graphs from the RRD file
+* runbacklog.pl -- rebuild a corrupted RRD file from the TXT logfile
+
+You will need the following prerequisites:
+
+* Perl
+* RRDtool
+
