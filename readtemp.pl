@@ -3,7 +3,11 @@
 use strict;
 use Device::SerialPort;
 
-my $PortName = "/dev/ttyUSB0";
+
+if (scalar(@ARGV) != 1) {
+    die "Port device not specified on command-line."
+}
+my $PortName = shift(@ARGV);
 
 my $PortObj = new Device::SerialPort ($PortName)
     || die "Can't open $PortName: $!\n";
